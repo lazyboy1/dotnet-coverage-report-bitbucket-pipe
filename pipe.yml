@@ -1,0 +1,16 @@
+name: .NET Coverage Report
+image: lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.1.0
+description: Generate coverage report and a build status based on coverage requirements
+category: Testing
+repository: https://github.com/lazyboy1/dotnet-coverage-report-bitbucket-pipe
+maintainer:
+  name: Amit Edelshtein
+  website: "https://github.com/lazyboy1"
+tags:
+  - bitbucket-pipelines
+  - coverage
+  - test
+  - code-coverage
+  - test-coverage
+  - dotnet
+  - .net
