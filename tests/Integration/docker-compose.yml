@@ -1,0 +1,35 @@
+﻿version: '3'
+
+services:
+  pipe:
+    build: '../../'
+    environment:
+      NETCORE_ENVIRONMENT: Test
+      BITBUCKET_WORKSPACE: workspace
+      BITBUCKET_REPO_SLUG: repo-slug
+      BITBUCKET_COMMIT: 222be690
+      BITBUCKET_OAUTH_KEY: key
+      BITBUCKET_OAUTH_SECRET: secret
+      LINE_COVERAGE_MINIMUM: 80
+      BRANCH_COVERAGE_MINIMUM: 80
+      PUBLISHED_REPORT_URL: https://example.com
+      DEBUG: 'true'
+    depends_on:
+      - bitbucket
+    links:
+      - 'bitbucket:bitbucket.org'
+      - 'bitbucket:api.bitbucket.org'
+    volumes:
+      - ./TestResults:/app/TestResults:ro
+  bitbucket:
+    build: 'DummyBitbucketServer/'
+    ports:
+      - 80
+      - 443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx
+    volumes:
+      - ./cert:/https:ro

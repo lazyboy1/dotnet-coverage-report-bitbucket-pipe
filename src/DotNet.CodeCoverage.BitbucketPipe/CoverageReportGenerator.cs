@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DotNet.CodeCoverage.BitbucketPipe.Model;
 using DotNet.CodeCoverage.BitbucketPipe.Utils;
 using Microsoft.Extensions.Logging;
 

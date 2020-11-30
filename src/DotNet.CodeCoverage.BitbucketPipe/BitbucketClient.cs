@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DotNet.CodeCoverage.BitbucketPipe.Model;
 using DotNet.CodeCoverage.BitbucketPipe.Model.Bitbucket.CommitStatuses;
 using DotNet.CodeCoverage.BitbucketPipe.Options;
 using DotNet.CodeCoverage.BitbucketPipe.Utils;
@@ -21,7 +22,6 @@ namespace DotNet.CodeCoverage.BitbucketPipe
         private readonly CoverageRequirementsOptions _requirementsOptions;
         private string Workspace { get; } = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_WORKSPACE");
         private string RepoSlug { get; } = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_REPO_SLUG");
-
         private string CommitHash { get; }
 
         public BitbucketClient(HttpClient client, ILogger<BitbucketClient> logger,
@@ -78,6 +78,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                 IgnoreNullValues = true,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
+
             return JsonSerializer.Serialize(obj, jsonSerializerOptions);
         }
 

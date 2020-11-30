@@ -1,4 +1,4 @@
-﻿namespace DotNet.CodeCoverage.BitbucketPipe
+﻿namespace DotNet.CodeCoverage.BitbucketPipe.Model
 {
     public class CoverageSummary
     {

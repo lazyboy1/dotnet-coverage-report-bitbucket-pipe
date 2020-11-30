@@ -20,7 +20,8 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                 ?? false;
             Log.Logger = LoggerInitializer.CreateLogger(isDebug);
 
-            Log.Logger.Debug("DEBUG={isDebug}", isDebug);
+            Log.Debug("DEBUG={isDebug}", isDebug);
+            Log.Debug("Workdir={workdir}", Environment.CurrentDirectory);
 
             var serviceProvider = await ConfigureServicesAsync();
 
@@ -42,13 +43,22 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                         client.DefaultRequestHeaders.Authorization =
                             new AuthenticationHeaderValue(
                                 OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer,
-                                accessToken)).Services
+                                accessToken))
+                    .ConfigurePrimaryHttpMessageHandler(ConfigureHttpMessageHandler).Services
                     .AddLogging(builder => builder.AddSerilog())
                     .Configure<CoverageRequirementsOptions>(ConfigureCoverageRequirementsOptions)
                     .Configure<PublishReportOptions>(ConfigurePublishReportOptions);
 
             return serviceCollection.BuildServiceProvider();
         }
+
+        private static HttpMessageHandler ConfigureHttpMessageHandler() => new HttpClientHandler
+        {
+            // ignore SSL errors in tests
+            ServerCertificateCustomValidationCallback = (request, x509Certificate2, x509Chain, sslPolicyErrors) =>
+                EnvironmentUtils.EnvironmentName == "Test" &&
+                (request.RequestUri.Host == "bitbucket.org" || request.RequestUri.Host == "api.bitbucket.org")
+        };
 
         private static void ConfigurePublishReportOptions(PublishReportOptions options)
         {
@@ -77,9 +87,9 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                 Secret = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_OAUTH_SECRET")
             };
 
-            Log.Logger.Debug("Getting access token...");
+            Log.Debug("Getting access token...");
 
-            using var httpClient = new HttpClient();
+            using var httpClient = new HttpClient(ConfigureHttpMessageHandler());
             var tokenRequest = new ClientCredentialsTokenRequest
             {
                 ClientId = authenticationOptions.Key,
@@ -91,11 +101,11 @@ namespace DotNet.CodeCoverage.BitbucketPipe
             var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(tokenRequest);
 
             if (!tokenResponse.IsError) {
-                Log.Logger.Debug("Got access token");
+                Log.Debug("Got access token");
                 return tokenResponse.AccessToken;
             }
 
-            Log.Logger.Error("Error getting access token: {@error}",
+            Log.Error("Error getting access token: {@error}",
                 new
                 {
                     tokenResponse.Error, tokenResponse.ErrorDescription, tokenResponse.ErrorType,

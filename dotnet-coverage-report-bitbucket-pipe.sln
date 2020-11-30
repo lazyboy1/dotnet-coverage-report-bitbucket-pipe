@@ -19,6 +19,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C3DBC274
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.CodeCoverage.BitbucketPipe.Tests", "tests\DotNet.CodeCoverage.BitbucketPipe.Tests\DotNet.CodeCoverage.BitbucketPipe.Tests.csproj", "{8643BE55-B74B-489F-9050-BB36CF4A5AB8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{FF2CF3AF-E8B9-4B40-AD80-A537536F360D}"
+ProjectSection(SolutionItems) = preProject
+	tests\Integration\docker-compose.yml = tests\Integration\docker-compose.yml
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyBitbucketServer", "tests\Integration\DummyBitbucketServer\DummyBitbucketServer.csproj", "{3D88C035-3A6F-4655-9E64-199C360C848E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{145F0A3B-574F-4BE3-8ACC-D2E441849D1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +42,16 @@ Global
 		{8643BE55-B74B-489F-9050-BB36CF4A5AB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8643BE55-B74B-489F-9050-BB36CF4A5AB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8643BE55-B74B-489F-9050-BB36CF4A5AB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D88C035-3A6F-4655-9E64-199C360C848E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D88C035-3A6F-4655-9E64-199C360C848E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D88C035-3A6F-4655-9E64-199C360C848E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D88C035-3A6F-4655-9E64-199C360C848E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6AFCBF3C-2251-4BD4-AB78-9536F26564D0} = {159AB7B9-379B-4D45-8A7D-417D63EC2BFA}
-		{8643BE55-B74B-489F-9050-BB36CF4A5AB8} = {C3DBC274-CBD2-4CBA-8D12-1C9F974C8ADB}
+		{FF2CF3AF-E8B9-4B40-AD80-A537536F360D} = {C3DBC274-CBD2-4CBA-8D12-1C9F974C8ADB}
+		{3D88C035-3A6F-4655-9E64-199C360C848E} = {FF2CF3AF-E8B9-4B40-AD80-A537536F360D}
+		{145F0A3B-574F-4BE3-8ACC-D2E441849D1B} = {C3DBC274-CBD2-4CBA-8D12-1C9F974C8ADB}
+		{8643BE55-B74B-489F-9050-BB36CF4A5AB8} = {145F0A3B-574F-4BE3-8ACC-D2E441849D1B}
 	EndGlobalSection
 EndGlobal

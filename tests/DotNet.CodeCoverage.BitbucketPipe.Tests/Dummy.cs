@@ -1,10 +1,11 @@
 using NUnit.Framework;
 
+// ReSharper disable All
+
 namespace DotNet.CodeCoverage.BitbucketPipe.Tests
 {
-    public class DummyTest
+    public class Dummy
     {
-        [Test]
         public void Test1() => Assert.Pass();
     }
 }
