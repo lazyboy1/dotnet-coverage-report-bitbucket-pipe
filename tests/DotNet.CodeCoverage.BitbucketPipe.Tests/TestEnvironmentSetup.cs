@@ -1,4 +1,4 @@
-﻿using System;
+﻿using static System.Environment;
 
 namespace DotNet.CodeCoverage.BitbucketPipe.Tests
 {
@@ -6,14 +6,14 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Tests
     {
         public static void SetupEnvironment()
         {
-            Environment.SetEnvironmentVariable("BITBUCKET_WORKSPACE", "Workspace");
-            Environment.SetEnvironmentVariable("BITBUCKET_REPO_SLUG", "repo-slug");
-            Environment.SetEnvironmentVariable("BITBUCKET_COMMIT", "222be690");
-            Environment.SetEnvironmentVariable("BITBUCKET_OAUTH_KEY", "oauth-key");
-            Environment.SetEnvironmentVariable("BITBUCKET_OAUTH_SECRET", "oauth-secret");
-            Environment.SetEnvironmentVariable("LINE_COVERAGE_MINIMUM", "80");
-            Environment.SetEnvironmentVariable("BRANCH_COVERAGE_MINIMUM", "80");
-            Environment.SetEnvironmentVariable("PUBLISHED_REPORT_URL", "");
+            SetEnvironmentVariable("BITBUCKET_WORKSPACE", "Workspace");
+            SetEnvironmentVariable("BITBUCKET_REPO_SLUG", "repo-slug");
+            SetEnvironmentVariable("BITBUCKET_COMMIT", "222be690");
+            SetEnvironmentVariable("BITBUCKET_OAUTH_KEY", "oauth-key");
+            SetEnvironmentVariable("BITBUCKET_OAUTH_SECRET", "oauth-secret");
+            SetEnvironmentVariable("LINE_COVERAGE_MINIMUM", "80");
+            SetEnvironmentVariable("BRANCH_COVERAGE_MINIMUM", "80");
+            SetEnvironmentVariable("PUBLISHED_REPORT_URL", "");
 
         }
     }

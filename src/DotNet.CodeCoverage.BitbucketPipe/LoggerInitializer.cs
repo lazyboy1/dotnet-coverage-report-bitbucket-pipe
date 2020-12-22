@@ -1,8 +1,10 @@
-﻿using Serilog;
+﻿using System.Diagnostics.CodeAnalysis;
+using Serilog;
 using Serilog.Core;
 
 namespace DotNet.CodeCoverage.BitbucketPipe
 {
+    [ExcludeFromCodeCoverage]
     public static class LoggerInitializer
     {
         public static Logger CreateLogger(bool isDebugOn)

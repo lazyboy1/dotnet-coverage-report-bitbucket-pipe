@@ -5,6 +5,7 @@
 // See also: https://github.com/dotnet/runtime/issues/782
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 
@@ -12,6 +13,7 @@ using System.Text.Json;
 
 namespace DotNet.CodeCoverage.BitbucketPipe
 {
+    [ExcludeFromCodeCoverage]
     public class JsonSnakeCaseNamingPolicy : JsonNamingPolicy
     {
         private enum SnakeCaseState

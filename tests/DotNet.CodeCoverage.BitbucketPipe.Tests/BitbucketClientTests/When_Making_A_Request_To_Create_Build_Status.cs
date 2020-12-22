@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using DotNet.CodeCoverage.BitbucketPipe.Model;
 using DotNet.CodeCoverage.BitbucketPipe.Options;
 using DotNet.CodeCoverage.BitbucketPipe.Tests.BDD;
-using DotNet.CodeCoverage.BitbucketPipe.Utils;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using static DotNet.CodeCoverage.BitbucketPipe.Utils.EnvironmentUtils;
 
 namespace DotNet.CodeCoverage.BitbucketPipe.Tests.BitbucketClientTests
 {
-    public class When_Generating_Coverage_Report : SpecificationBase
+    public class When_Making_A_Request_To_Create_Build_Status : SpecificationBase
     {
         private Mock<HttpMessageHandler> _httpMessageHandlerMock;
         private BitbucketClient _bitbucketClient;
@@ -59,9 +59,9 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Tests.BitbucketClientTests
         [Then]
         public void It_Should_Make_One_Post_Call_To_Create_Build_Status()
         {
-            string commit = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_COMMIT");
-            string repoSlug = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_REPO_SLUG");
-            string workspace = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_WORKSPACE");
+            string commit = GetRequiredEnvironmentVariable("BITBUCKET_COMMIT");
+            string repoSlug = GetRequiredEnvironmentVariable("BITBUCKET_REPO_SLUG");
+            string workspace = GetRequiredEnvironmentVariable("BITBUCKET_WORKSPACE");
 
             _httpMessageHandlerMock.Protected().Verify("SendAsync", Times.Once(),
                 ItExpr.Is<HttpRequestMessage>(message =>

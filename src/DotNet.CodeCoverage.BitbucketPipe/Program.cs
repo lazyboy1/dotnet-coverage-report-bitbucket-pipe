@@ -3,11 +3,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using DotNet.CodeCoverage.BitbucketPipe.Options;
-using DotNet.CodeCoverage.BitbucketPipe.Utils;
 using IdentityModel;
 using IdentityModel.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using static System.Environment;
+using static DotNet.CodeCoverage.BitbucketPipe.Options.OptionsConfigurator;
+using static DotNet.CodeCoverage.BitbucketPipe.Utils.EnvironmentUtils;
 
 namespace DotNet.CodeCoverage.BitbucketPipe
 {
@@ -16,12 +18,12 @@ namespace DotNet.CodeCoverage.BitbucketPipe
         private static async Task Main()
         {
             bool isDebug =
-                Environment.GetEnvironmentVariable("DEBUG")?.Equals("true", StringComparison.OrdinalIgnoreCase)
+                GetEnvironmentVariable("DEBUG")?.Equals("true", StringComparison.OrdinalIgnoreCase)
                 ?? false;
             Log.Logger = LoggerInitializer.CreateLogger(isDebug);
 
             Log.Debug("DEBUG={isDebug}", isDebug);
-            Log.Debug("Workdir={workdir}", Environment.CurrentDirectory);
+            Log.Debug("Workdir={workdir}", CurrentDirectory);
 
             var serviceProvider = await ConfigureServicesAsync();
 
@@ -47,7 +49,8 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                     .ConfigurePrimaryHttpMessageHandler(ConfigureHttpMessageHandler).Services
                     .AddLogging(builder => builder.AddSerilog())
                     .Configure<CoverageRequirementsOptions>(ConfigureCoverageRequirementsOptions)
-                    .Configure<PublishReportOptions>(ConfigurePublishReportOptions);
+                    .Configure<PublishReportOptions>(ConfigurePublishReportOptions)
+                    .Configure<ReportGeneratorOptions>(ConfigureReportGeneratorOptions);
 
             return serviceCollection.BuildServiceProvider();
         }
@@ -56,35 +59,16 @@ namespace DotNet.CodeCoverage.BitbucketPipe
         {
             // ignore SSL errors in tests
             ServerCertificateCustomValidationCallback = (request, x509Certificate2, x509Chain, sslPolicyErrors) =>
-                EnvironmentUtils.EnvironmentName == "Test" &&
+                EnvironmentName == "Test" &&
                 (request.RequestUri.Host == "bitbucket.org" || request.RequestUri.Host == "api.bitbucket.org")
         };
-
-        private static void ConfigurePublishReportOptions(PublishReportOptions options)
-        {
-            string? reportUrlStr = Environment.GetEnvironmentVariable("PUBLISHED_REPORT_URL");
-            Uri.TryCreate(reportUrlStr, UriKind.Absolute, out var reportUrl);
-            options.ReportUrl = reportUrl;
-        }
-
-        private static void ConfigureCoverageRequirementsOptions(CoverageRequirementsOptions options)
-        {
-            string? lineCoverageString = Environment.GetEnvironmentVariable("LINE_COVERAGE_MINIMUM");
-            string? branchCoverageString = Environment.GetEnvironmentVariable("BRANCH_COVERAGE_MINIMUM");
-
-            int.TryParse(lineCoverageString, out int lineCoverageMinimum);
-            int.TryParse(branchCoverageString, out int branchCoverageMinimum);
-
-            options.LineCoveragePercentageMinimum = lineCoverageMinimum;
-            options.BranchCoveragePercentageMinimum = branchCoverageMinimum;
-        }
 
         private static async Task<string> GetAccessTokenAsync()
         {
             var authenticationOptions = new BitbucketAuthenticationOptions
             {
-                Key = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_OAUTH_KEY"),
-                Secret = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_OAUTH_SECRET")
+                Key = GetRequiredEnvironmentVariable("BITBUCKET_OAUTH_KEY"),
+                Secret = GetRequiredEnvironmentVariable("BITBUCKET_OAUTH_SECRET")
             };
 
             Log.Debug("Getting access token...");
