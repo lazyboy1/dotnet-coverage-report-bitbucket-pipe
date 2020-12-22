@@ -11,6 +11,7 @@ ProjectSection(SolutionItems) = preProject
 	inspectcode.config = inspectcode.config
 	pipe.yml = pipe.yml
 	README.md = README.md
+	CONTRIBUTING.md = CONTRIBUTING.md
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{159AB7B9-379B-4D45-8A7D-417D63EC2BFA}"
