@@ -97,7 +97,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
             _logger.LogDebug("PUTing report: {report}", serializedReport);
 
-            var response = await _httpClient.PutAsync("reports/coverage-report",
+            var response = await _httpClient.PutAsync($"reports/{pipelineReport.ExternalId}",
                 CreateStringContent(serializedReport));
             await VerifyResponseAsync(response);
         }

@@ -30,7 +30,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Tests.BitbucketClientTests
                 ItExpr.Is<HttpRequestMessage>(message =>
                     message.Method == HttpMethod.Put &&
                     message.RequestUri.PathAndQuery.EndsWith(
-                        $"{workspace}/{repoSlug}/commit/{commit}/reports/coverage-report")),
+                        $"{workspace}/{repoSlug}/commit/{commit}/reports/code-coverage")),
                 ItExpr.IsAny<CancellationToken>());
         }
     }
