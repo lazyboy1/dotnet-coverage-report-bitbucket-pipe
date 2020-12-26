@@ -76,6 +76,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
             {
                 Title = "Code Coverage",
                 Details = "Line and branch coverage summary",
+                Link = _publishOptions.ReportUrl,
                 ExternalId = "code-coverage",
                 ReportType = ReportType.Coverage,
                 Result = CoverageMeetsRequirements(summary) ? Result.Passed : Result.Failed,
