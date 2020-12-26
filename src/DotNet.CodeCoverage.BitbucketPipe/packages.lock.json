@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "IdentityModel": {
         "type": "Direct",
-        "requested": "[4.5.0, )",
-        "resolved": "4.5.0",
-        "contentHash": "8W2YtlzCpKRQt0s/pEuaVqUOibbXJA7VFEMMfCfrQB0m0O9VIJ2p/pJljtluFbvSOubmnszqxjKa2BDVgqlesg==",
+        "requested": "[4.6.0, )",
+        "resolved": "4.6.0",
+        "contentHash": "p0vnXWU3e7lFXY6MAUtEBPcXB29LArU+BcqEEVu7LdPW6yD07/uURtnl8q6oT1crC8fjTTRSPbRzFuOGAz/i3w==",
         "dependencies": {
           "Newtonsoft.Json": "11.0.2",
           "System.Text.Encodings.Web": "5.0.0"
