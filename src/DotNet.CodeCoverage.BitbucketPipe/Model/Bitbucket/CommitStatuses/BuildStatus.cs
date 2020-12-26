@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using JetBrains.Annotations;
 
 namespace DotNet.CodeCoverage.BitbucketPipe.Model.Bitbucket.CommitStatuses
 {
-    [Serializable, PublicAPI]
+    [Serializable]
     public class BuildStatus
     {
         public BuildStatus(string key, string name, State state, string workspace, string repoSlug, Uri? url = null)

@@ -28,6 +28,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
             var bitbucketClient = serviceProvider.GetRequiredService<BitbucketClient>();
             await bitbucketClient.CreateCommitBuildStatusAsync(coverageSummary);
+            await bitbucketClient.CreateReportAsync(coverageSummary);
         }
 
         private static async Task<ServiceProvider> ConfigureServicesAsync()

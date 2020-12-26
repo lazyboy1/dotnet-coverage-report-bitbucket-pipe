@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DotNet.CodeCoverage.BitbucketPipe.Model;
 using DotNet.CodeCoverage.BitbucketPipe.Model.Bitbucket.CommitStatuses;
+using DotNet.CodeCoverage.BitbucketPipe.Model.Bitbucket.Report;
 using DotNet.CodeCoverage.BitbucketPipe.Options;
 using DotNet.CodeCoverage.BitbucketPipe.Utils;
 using Microsoft.Extensions.Logging;
@@ -20,9 +21,6 @@ namespace DotNet.CodeCoverage.BitbucketPipe
         private readonly ILogger<BitbucketClient> _logger;
         private readonly PublishReportOptions _publishOptions;
         private readonly CoverageRequirementsOptions _requirementsOptions;
-        private string Workspace { get; } = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_WORKSPACE");
-        private string RepoSlug { get; } = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_REPO_SLUG");
-        private string CommitHash { get; }
 
         public BitbucketClient(HttpClient client, ILogger<BitbucketClient> logger,
             IOptions<PublishReportOptions> publishOptions, IOptions<CoverageRequirementsOptions> requirementsOptions)
@@ -45,14 +43,16 @@ namespace DotNet.CodeCoverage.BitbucketPipe
             _logger.LogDebug("Base address: {baseAddress}", client.BaseAddress);
         }
 
+        private string Workspace { get; } = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_WORKSPACE");
+        private string RepoSlug { get; } = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_REPO_SLUG");
+        private string CommitHash { get; }
+
         public async Task CreateCommitBuildStatusAsync(CoverageSummary summary)
         {
             _logger.LogDebug("Coverage requirements: {@CoverageRequirements}", _requirementsOptions);
             _logger.LogDebug("Coverage summary: {@CoverageSummary}", summary);
 
-            bool meetsRequirements =
-                _requirementsOptions.BranchCoveragePercentageMinimum <= summary.BranchCoveragePercentage &&
-                _requirementsOptions.LineCoveragePercentageMinimum <= summary.LineCoveragePercentage;
+            bool meetsRequirements = CoverageMeetsRequirements(summary);
 
             _logger.LogDebug("Coverage meets requirements? {meetsRequirements}", meetsRequirements);
 
@@ -69,6 +69,42 @@ namespace DotNet.CodeCoverage.BitbucketPipe
             var response = await _httpClient.PostAsync("statuses/build", CreateStringContent(serializedBuildStatus));
             await VerifyResponseAsync(response);
         }
+
+        public async Task CreateReportAsync(CoverageSummary summary)
+        {
+            var pipelineReport = new PipelineReport
+            {
+                Title = "Code Coverage",
+                ExternalId = "code-coverage",
+                ReportType = ReportType.Coverage,
+                Result = CoverageMeetsRequirements(summary) ? Result.Passed : Result.Failed,
+                Data =
+                {
+                    new ReportDataItem
+                    {
+                        Title = "Line Coverage", Type = ReportDataType.Percentage,
+                        Value = summary.LineCoveragePercentage
+                    },
+                    new ReportDataItem
+                    {
+                        Title = "Branch Coverage", Type = ReportDataType.Percentage,
+                        Value = summary.BranchCoveragePercentage
+                    }
+                }
+            };
+
+            string serializedReport = Serialize(pipelineReport);
+
+            _logger.LogDebug("PUTing report: {report}", serializedReport);
+
+            var response = await _httpClient.PutAsync("reports/coverage-report",
+                CreateStringContent(serializedReport));
+            await VerifyResponseAsync(response);
+        }
+
+        private bool CoverageMeetsRequirements(CoverageSummary summary) =>
+            _requirementsOptions.BranchCoveragePercentageMinimum <= summary.BranchCoveragePercentage &&
+            _requirementsOptions.LineCoveragePercentageMinimum <= summary.LineCoveragePercentage;
 
         private static string Serialize(object obj)
         {
