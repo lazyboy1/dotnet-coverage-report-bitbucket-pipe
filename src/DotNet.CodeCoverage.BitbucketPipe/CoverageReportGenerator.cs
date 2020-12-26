@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -50,14 +51,17 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
         private string PrepareCommandArguments()
         {
+            string verbosityLevel = EnvironmentUtils.IsDebugMode ? "Verbose" : "Warning";
             string[] basicArguments =
             {
                 "\"-reports:**/coverage*.xml\"",
                 $"-targetdir:{_coverageReportPath}",
-                "-reporttypes:JsonSummary;Html"
+                "-reporttypes:JsonSummary;Html",
+                $"-verbosity:{verbosityLevel}"
             };
             string[] allArguments;
             if (_options.ExtraArguments != null && _options.ExtraArguments.Length > 0) {
+                ValidatePluginsArgument(_options.ExtraArguments);
                 allArguments = basicArguments.Concat(_options.ExtraArguments).ToArray();
             }
             else {
@@ -66,6 +70,33 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
             string argumentsString = string.Join(' ', allArguments);
             return argumentsString;
+        }
+
+        private void ValidatePluginsArgument(IEnumerable<string> optionsExtraArguments)
+        {
+            string? pluginsArg = optionsExtraArguments.FirstOrDefault(a => a.StartsWith("-plugins:"));
+            if (pluginsArg == null) {
+                return;
+            }
+
+            _logger.LogDebug("Found plugins in extra_args");
+            string[] pluginsPaths = pluginsArg.Split(':')[1].Split(';');
+            foreach (string path in pluginsPaths) {
+                var fileInfo = new FileInfo(path);
+                _logger.LogDebug("Checking existence of {path}", path);
+                bool exists = fileInfo.Exists;
+                if (exists) {
+                    _logger.LogDebug("{path} exists", path);
+                }
+                else {
+                    _logger.LogWarning("{path} doesn't exist!", path);
+                }
+
+                if (!Path.IsPathFullyQualified(path)) {
+                    _logger.LogWarning("The plugin at {path} will probably fail to load, " +
+                                       "because Report Generator will only load plugins using absolute paths.", path);
+                }
+            }
         }
 
         private async Task<CoverageSummary> ParseCoverageSummaryAsync()

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using DotNet.CodeCoverage.BitbucketPipe.Options;
@@ -17,12 +16,9 @@ namespace DotNet.CodeCoverage.BitbucketPipe
     {
         private static async Task Main()
         {
-            bool isDebug =
-                GetEnvironmentVariable("DEBUG")?.Equals("true", StringComparison.OrdinalIgnoreCase)
-                ?? false;
-            Log.Logger = LoggerInitializer.CreateLogger(isDebug);
+            Log.Logger = LoggerInitializer.CreateLogger(IsDebugMode);
 
-            Log.Debug("DEBUG={isDebug}", isDebug);
+            Log.Debug("DEBUG={isDebug}", IsDebugMode);
             Log.Debug("Workdir={workdir}", CurrentDirectory);
 
             var serviceProvider = await ConfigureServicesAsync();
@@ -46,7 +42,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                             new AuthenticationHeaderValue(
                                 OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer,
                                 accessToken))
-                    .ConfigurePrimaryHttpMessageHandler(ConfigureHttpMessageHandler).Services
+                    .ConfigurePrimaryHttpMessageHandler(ConfigureHttpMessageHandlerForTests).Services
                     .AddLogging(builder => builder.AddSerilog())
                     .Configure<CoverageRequirementsOptions>(ConfigureCoverageRequirementsOptions)
                     .Configure<PublishReportOptions>(ConfigurePublishReportOptions)
@@ -55,12 +51,12 @@ namespace DotNet.CodeCoverage.BitbucketPipe
             return serviceCollection.BuildServiceProvider();
         }
 
-        private static HttpMessageHandler ConfigureHttpMessageHandler() => new HttpClientHandler
+        private static HttpMessageHandler ConfigureHttpMessageHandlerForTests() => new HttpClientHandler
         {
             // ignore SSL errors in tests
             ServerCertificateCustomValidationCallback = (request, x509Certificate2, x509Chain, sslPolicyErrors) =>
-                EnvironmentName == "Test" &&
-                (request.RequestUri.Host == "bitbucket.org" || request.RequestUri.Host == "api.bitbucket.org")
+                EnvironmentName != "Test" || request.RequestUri.Host == "bitbucket.org" ||
+                request.RequestUri.Host == "api.bitbucket.org"
         };
 
         private static async Task<string> GetAccessTokenAsync()
@@ -73,7 +69,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
             Log.Debug("Getting access token...");
 
-            using var httpClient = new HttpClient(ConfigureHttpMessageHandler());
+            using var httpClient = new HttpClient(ConfigureHttpMessageHandlerForTests());
             var tokenRequest = new ClientCredentialsTokenRequest
             {
                 ClientId = authenticationOptions.Key,
@@ -93,7 +89,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                 new
                 {
                     tokenResponse.Error, tokenResponse.ErrorDescription, tokenResponse.ErrorType,
-                    tokenResponse.HttpErrorReason, tokenResponse.HttpStatusCode
+                    tokenResponse.HttpStatusCode
                 });
 
             throw new OAuthException(tokenResponse);

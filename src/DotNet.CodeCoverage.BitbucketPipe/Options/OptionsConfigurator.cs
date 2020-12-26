@@ -26,11 +26,6 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Options
 
         public static void ConfigureReportGeneratorOptions(ReportGeneratorOptions options)
         {
-            string? extraArguments = Environment.GetEnvironmentVariable("EXTRA_ARGS");
-            if (string.IsNullOrWhiteSpace(extraArguments)) {
-                return;
-            }
-
             string? extraArgsCountString = Environment.GetEnvironmentVariable("EXTRA_ARGS_COUNT");
             int.TryParse(extraArgsCountString, out int extraArgsCount);
             if (extraArgsCount <= 0) {
