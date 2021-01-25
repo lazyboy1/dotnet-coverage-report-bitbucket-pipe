@@ -26,6 +26,12 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Options
 
         public static void ConfigureReportGeneratorOptions(ReportGeneratorOptions options)
         {
+            string? reportTypes = Environment.GetEnvironmentVariable("REPORT_TYPES");
+            options.ReportTypes = reportTypes ?? "JsonSummary;Html";
+
+            string? reports = Environment.GetEnvironmentVariable("REPORTS");
+            options.Reports = reports ?? "**/coverage*.xml";
+
             string? extraArgsCountString = Environment.GetEnvironmentVariable("EXTRA_ARGS_COUNT");
             int.TryParse(extraArgsCountString, out int extraArgsCount);
             if (extraArgsCount <= 0) {

@@ -18,8 +18,8 @@ namespace DotNet.CodeCoverage.BitbucketPipe
         {
             Log.Logger = LoggerInitializer.CreateLogger(IsDebugMode);
 
-            Log.Debug("DEBUG={isDebug}", IsDebugMode);
-            Log.Debug("Workdir={workdir}", CurrentDirectory);
+            Log.Debug("DEBUG={IsDebug}", IsDebugMode);
+            Log.Debug("Workdir={Workdir}", CurrentDirectory);
 
             var serviceProvider = await ConfigureServicesAsync();
 
@@ -86,7 +86,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                 return tokenResponse.AccessToken;
             }
 
-            Log.Error("Error getting access token: {@error}",
+            Log.Error("Error getting access token: {@Error}",
                 new
                 {
                     tokenResponse.Error, tokenResponse.ErrorDescription, tokenResponse.ErrorType,

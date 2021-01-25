@@ -54,9 +54,9 @@ namespace DotNet.CodeCoverage.BitbucketPipe
             string verbosityLevel = EnvironmentUtils.IsDebugMode ? "Verbose" : "Warning";
             string[] basicArguments =
             {
-                "\"-reports:**/coverage*.xml\"",
+                $"\"-reports:{_options.Reports}\"",
                 $"-targetdir:{_coverageReportPath}",
-                "-reporttypes:JsonSummary;Html",
+                $"-reporttypes:{_options.ReportTypes}",
                 $"-verbosity:{verbosityLevel}"
             };
             string[] allArguments;
@@ -83,18 +83,18 @@ namespace DotNet.CodeCoverage.BitbucketPipe
             string[] pluginsPaths = pluginsArg.Split(':')[1].Split(';');
             foreach (string path in pluginsPaths) {
                 var fileInfo = new FileInfo(path);
-                _logger.LogDebug("Checking existence of {path}", path);
+                _logger.LogDebug("Checking existence of {Path}", path);
                 bool exists = fileInfo.Exists;
                 if (exists) {
-                    _logger.LogDebug("{path} exists", path);
+                    _logger.LogDebug("{Path} exists", path);
                 }
                 else {
-                    _logger.LogWarning("{path} doesn't exist!", path);
+                    _logger.LogWarning("{Path} doesn't exist!", path);
                 }
 
                 if (!Path.IsPathFullyQualified(path)) {
-                    _logger.LogWarning("The plugin at {path} will probably fail to load, " +
-                                       "because Report Generator will only load plugins using absolute paths.", path);
+                    _logger.LogWarning("The plugin at {Path} will probably fail to load, " +
+                                       "because Report Generator will only load plugins using absolute paths", path);
                 }
             }
         }

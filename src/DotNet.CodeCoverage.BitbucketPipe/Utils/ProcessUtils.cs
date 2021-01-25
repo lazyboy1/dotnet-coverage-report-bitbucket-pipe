@@ -18,7 +18,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Utils
             using var process = new Process {StartInfo = processStartInfo};
             cancellationToken.ThrowIfCancellationRequested();
 
-            logger?.LogDebug("Executing command: {command}", $"{executable} {arguments}");
+            logger?.LogDebug("Executing command: {Command}", $"{executable} {arguments}");
             process.Start();
 
             while (!process.HasExited && !cancellationToken.IsCancellationRequested) {
@@ -30,7 +30,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Utils
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            logger?.LogDebug("Exit code: {exitCode}", process.ExitCode);
+            logger?.LogDebug("Exit code: {ExitCode}", process.ExitCode);
             if (process.ExitCode != 0) {
                 throw new ProcessErroredException(process.StartInfo.FileName, process.StartInfo.Arguments,
                     process.ExitCode, "", "");
