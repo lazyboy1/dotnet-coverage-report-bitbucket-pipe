@@ -11,7 +11,7 @@ your `bitbucket-pipelines.yml` file:
 
 ```yaml
 script:
-  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.3
+  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.4
     variables:
       BITBUCKET_OAUTH_KEY: "<string>"
       BITBUCKET_OAUTH_SECRET: "<string>"
@@ -90,7 +90,7 @@ Basic example using secure variables for OAuth:
 
 ```yaml
 script:
-  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.3
+  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.4
     variables:
       BITBUCKET_OAUTH_KEY: $OAUTH_KEY
       BITBUCKET_OAUTH_SECRET: $OAUTH_SECRET
@@ -102,12 +102,12 @@ Example with published report URL:
 
 ```yaml
 script:
-  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.3
+  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.4
     variables:
       BITBUCKET_OAUTH_KEY: $OAUTH_KEY
       BITBUCKET_OAUTH_SECRET: $OAUTH_SECRET
       LINE_COVERAGE_MINIMUM: "80"
-      BRANCH_COVERAGE_MINIMUM: "80",
+      BRANCH_COVERAGE_MINIMUM: "80"
       PUBLISHED_REPORT_URL: "https://my-server.com/coverage/$BITBUCKET_REPO_SLUG/$BITBUCKET_COMMIT/index.html"
 ```
 
@@ -115,7 +115,7 @@ Example with extra arguments:
 
 ```yaml
 script:
-  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.3
+  - pipe: docker://lazyboy1/dotnet-coverage-report-bitbucket-pipe:0.4
     variables:
       BITBUCKET_OAUTH_KEY: $OAUTH_KEY
       BITBUCKET_OAUTH_SECRET: $OAUTH_SECRET
