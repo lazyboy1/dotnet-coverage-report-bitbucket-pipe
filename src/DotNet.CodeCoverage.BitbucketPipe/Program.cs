@@ -1,5 +1,7 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Security;
 using System.Threading.Tasks;
 using DotNet.CodeCoverage.BitbucketPipe.Options;
 using IdentityModel;
@@ -7,7 +9,6 @@ using IdentityModel.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using static System.Environment;
-using static DotNet.CodeCoverage.BitbucketPipe.Options.OptionsConfigurator;
 using static DotNet.CodeCoverage.BitbucketPipe.Utils.EnvironmentUtils;
 
 namespace DotNet.CodeCoverage.BitbucketPipe
@@ -45,9 +46,10 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                                 accessToken))
                     .ConfigurePrimaryHttpMessageHandler(ConfigureHttpMessageHandlerForTests).Services
                     .AddLogging(builder => builder.AddSerilog())
-                    .Configure<CoverageRequirementsOptions>(ConfigureCoverageRequirementsOptions)
-                    .Configure<PublishReportOptions>(ConfigurePublishReportOptions)
-                    .Configure<ReportGeneratorOptions>(ConfigureReportGeneratorOptions);
+                    .Configure<CoverageRequirementsOptions>(CoverageRequirementsOptions.Configure)
+                    .Configure<PublishReportOptions>(PublishReportOptions.Configure)
+                    .Configure<ReportGeneratorOptions>(ReportGeneratorOptions.Configure)
+                    .Configure<BitbucketOptions>(BitbucketOptions.Configure);
 
             return serviceCollection.BuildServiceProvider();
         }
@@ -56,8 +58,8 @@ namespace DotNet.CodeCoverage.BitbucketPipe
         {
             // ignore SSL errors in tests
             ServerCertificateCustomValidationCallback = (request, x509Certificate2, x509Chain, sslPolicyErrors) =>
-                EnvironmentName != "Test" || request.RequestUri.Host == "bitbucket.org" ||
-                request.RequestUri.Host == "api.bitbucket.org"
+                EnvironmentName.Equals("Test", StringComparison.OrdinalIgnoreCase) ||
+                sslPolicyErrors == SslPolicyErrors.None
         };
 
         private static async Task<string> GetAccessTokenAsync()

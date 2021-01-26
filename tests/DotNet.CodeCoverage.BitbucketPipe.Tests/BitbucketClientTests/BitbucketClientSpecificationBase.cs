@@ -38,9 +38,12 @@ namespace DotNet.CodeCoverage.BitbucketPipe.Tests.BitbucketClientTests
                 new CoverageRequirementsOptions
                     {BranchCoveragePercentageMinimum = 80, LineCoveragePercentageMinimum = 80});
 
+            var bitbucketOptions = Mock.Of<IOptions<BitbucketOptions>>(options => options.Value ==
+                new BitbucketOptions
+                {ReportTitle = "Code Coverage", BuildStatusName = "Code Coverage"});
+
             BitbucketClient = new BitbucketClient(httpClient, NullLogger<BitbucketClient>.Instance,
-                publishReportOptions,
-                requirementsOptions);
+                publishReportOptions, requirementsOptions, bitbucketOptions);
         }
     }
 }

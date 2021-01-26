@@ -19,14 +19,17 @@ namespace DotNet.CodeCoverage.BitbucketPipe
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<BitbucketClient> _logger;
+        private readonly BitbucketOptions _bitbucketOptions;
         private readonly PublishReportOptions _publishOptions;
         private readonly CoverageRequirementsOptions _requirementsOptions;
 
         public BitbucketClient(HttpClient client, ILogger<BitbucketClient> logger,
-            IOptions<PublishReportOptions> publishOptions, IOptions<CoverageRequirementsOptions> requirementsOptions)
+            IOptions<PublishReportOptions> publishOptions, IOptions<CoverageRequirementsOptions> requirementsOptions,
+            IOptions<BitbucketOptions> bitbucketOptions)
         {
             _httpClient = client;
             _logger = logger;
+            _bitbucketOptions = bitbucketOptions.Value;
             _publishOptions = publishOptions.Value;
             _requirementsOptions = requirementsOptions.Value;
 
@@ -40,7 +43,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
                 new Uri(
                     $"https://api.bitbucket.org/2.0/repositories/{Workspace}/{RepoSlug}/commit/{CommitHash}/");
 
-            _logger.LogDebug("Base address: {baseAddress}", client.BaseAddress);
+            _logger.LogDebug("Base address: {BaseAddress}", client.BaseAddress);
         }
 
         private string Workspace { get; } = EnvironmentUtils.GetRequiredEnvironmentVariable("BITBUCKET_WORKSPACE");
@@ -54,17 +57,17 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
             bool meetsRequirements = CoverageMeetsRequirements(summary);
 
-            _logger.LogDebug("Coverage meets requirements? {meetsRequirements}", meetsRequirements);
+            _logger.LogDebug("Coverage meets requirements? {MeetsRequirements}", meetsRequirements);
 
             const string key = "Code-Coverage";
-            const string name = "Code Coverage Report";
             var state = meetsRequirements ? State.Successful : State.Failed;
-            var buildStatus = new BuildStatus(key, name, state, Workspace, RepoSlug, _publishOptions.ReportUrl)
+            var buildStatus = new BuildStatus(key, _bitbucketOptions.BuildStatusName, state, Workspace, RepoSlug,
+                    _publishOptions.ReportUrl)
                 {Description = state == State.Failed ? "Coverage doesn't meet requirements" : ""};
 
             string serializedBuildStatus = Serialize(buildStatus);
 
-            _logger.LogDebug("POSTing build status: {buildStatus}", serializedBuildStatus);
+            _logger.LogDebug("POSTing build status: {BuildStatus}", serializedBuildStatus);
 
             var response = await _httpClient.PostAsync("statuses/build", CreateStringContent(serializedBuildStatus));
             await VerifyResponseAsync(response);
@@ -74,7 +77,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
         {
             var pipelineReport = new PipelineReport
             {
-                Title = "Code Coverage",
+                Title = _bitbucketOptions.ReportTitle,
                 Details = "Line and branch coverage summary",
                 Link = _publishOptions.ReportUrl,
                 ExternalId = "code-coverage",
@@ -97,7 +100,7 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
             string serializedReport = Serialize(pipelineReport);
 
-            _logger.LogDebug("PUTing report: {report}", serializedReport);
+            _logger.LogDebug("PUTing report: {Report}", serializedReport);
 
             var response = await _httpClient.PutAsync($"reports/{pipelineReport.ExternalId}",
                 CreateStringContent(serializedReport));
@@ -125,10 +128,10 @@ namespace DotNet.CodeCoverage.BitbucketPipe
 
         private async Task VerifyResponseAsync(HttpResponseMessage response)
         {
-            _logger.LogDebug("Response status code: {statusCode}", (int) response.StatusCode);
+            _logger.LogDebug("Response status code: {StatusCode}", (int) response.StatusCode);
             if (!response.IsSuccessStatusCode) {
                 string error = await response.Content.ReadAsStringAsync();
-                _logger.LogError("Error response: {error}", error);
+                _logger.LogError("Error response: {Error}", error);
             }
 
             response.EnsureSuccessStatusCode();

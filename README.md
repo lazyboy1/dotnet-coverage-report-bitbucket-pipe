@@ -1,7 +1,7 @@
 ﻿# Bitbucket Pipelines Pipe: .NET Coverage Report Pipe
 
 Generate coverage reports for .NET apps
-with [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
+using [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
 and a build status based on coverage requirements.
 
 ## YAML Definition
@@ -17,6 +17,8 @@ script:
       BITBUCKET_OAUTH_SECRET: "<string>"
       # LINE_COVERAGE_MINIMUM: "<int>" # Optional, default: 0
       # BRANCH_COVERAGE_MINIMUM: "<int>" # Optional, default: 0
+      # BUILD_STATUS_NAME: "<string>" # Optional, default: PIPELINE_REPORT_TITLE if present, else "Code Coverage"
+      # PIPELINE_REPORT_TITLE: "<string>" # Optional, default: BUILD_STATUS_NAME if present, else "Code Coverage"
       # PUBLISHED_REPORT_URL: "<string>" # Optional
       # REPORTS: "<string>" # Optional, default: "**/coverage*.xml"
       # REPORT_TYPES: "<string>" # Optional, default: "JsonSummary;Html"
@@ -30,6 +32,8 @@ script:
 | -------- | ----- |
 | BITBUCKET_OAUTH_KEY (\*)    | OAuth consumer key |
 | BITBUCKET_OAUTH_SECRET (\*) | OAuth consumer secret |
+| BUILD_STATUS_NAME           | Name of build status created by pipe. Default: PIPELINE_REPORT_TITLE if present, else `"Code Coverage"` |
+| PIPELINE_REPORT_TITLE       | Title of Pipeline report created by pipe. Default: BUILD_STATUS_NAME if present, else `"Code Coverage"` |
 | REPORTS                     | Path(s) to coverage reports. Supports globbing. Passed as value of `-reports` argument to `reportgenerator`. Default: `**/coverage*.xml` |
 | REPORT_TYPES                | The types of reports to generate. Passed as value of `-reporttypes` argument to `reportgenerator`. Default: `JsonSummary;Html`. Note: JsonSummary is required to enforce minimum requirements. |
 | LINE_COVERAGE_MINIMUM       | Minimum requirement for line coverage percentage. Default: `0` |
@@ -80,9 +84,9 @@ settings. The easiest way to set up code coverage collection:
 Report files are generated in folder `./coverage-report`. You can use another
 pipe to upload the report files to your preferred storage provider. If you
 provide the expected report URL in `PUBLISHED_REPORT_URL` variable, it will be
-used as the link for the build status for easy access. Depending on your storage
-provider, you may need to link directly to the `index.html` file in order to be
-able browse to it.
+used as the link for the build status and the Pipeline report for easy access.
+Depending on your storage provider, you may need to link directly to the
+`index.html` file in order to be able browse to it.
 
 ## Examples
 
@@ -123,9 +127,8 @@ script:
       BRANCH_COVERAGE_MINIMUM: "80"
       REPORTS: "coverage/cobertura.xml"
       REPORT_TYPES: "JsonSummary;HtmlSummary"
-      EXTRA_ARGS: ['-plugins:my-history-storage-plugin.dll', '"-classfilters:+IncludeThisClass;-ExcludeThisClass"']
+      EXTRA_ARGS: [ '-plugins:my-history-storage-plugin.dll', '"-classfilters:+IncludeThisClass;-ExcludeThisClass"' ]
       PUBLISHED_REPORT_URL: "https://my-server.com/coverage/$BITBUCKET_REPO_SLUG/$BITBUCKET_COMMIT/summary.html"
-
 ```
 
 ## Support
